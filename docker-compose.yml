@@ -1,0 +1,19 @@
+version: '1.0'
+
+services:
+  backend:
+    container_name: backend
+    restart: always
+    command: /app/start.sh
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./app:/app/app
+    env_file:
+      - .env
+    extra_hosts:
+    # 让docker可以连接到本地的网络，从而连接本地数据库服务
+      - "host.docker.internal:host-gateway"

@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "app"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.111.0"
+sqlmodel = "^0.0.19"
+tenacity = "^8.5.0"
+alembic = "^1.13.2"
+psycopg2-binary = "^2.9.9"
+watchfiles = "^0.22.0"
+pydantic-settings = "^2.3.4"
+psycopg = "^3.2.1"
+passlib = "^1.7.4"
+python-jose = "^3.3.0"
+psycopg2 = "^2.9.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
