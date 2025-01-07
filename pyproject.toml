@@ -14,7 +14,7 @@ alembic = "^1.13.2"
 psycopg2-binary = "^2.9.9"
 watchfiles = "^0.22.0"
 pydantic-settings = "^2.3.4"
-psycopg = "^3.2.1"
+psycopg = {version = "^3.2.1", extras = ["binary", "pool"]}
 passlib = "^1.7.4"
 python-jose = "^3.3.0"
 psycopg2 = "^2.9.9"

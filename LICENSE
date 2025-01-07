@@ -1,21 +1,16 @@
-MIT License
+MIT 开源许可证
 
-Copyright (c) 2024 PureFantasyZhao
+版权所有 (c) 2024 纯想全栈开发模版
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+特此授予任何获得本软件及其相关文档（以下简称"软件"）副本的个人和机构免费且无限制的使用权，
+包括但不限于使用、复制、修改、合并、发布、分发、再授权和/或销售本软件的副本，以及允许获得
+本软件的个人或机构这样做，但须遵守以下条件：
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+上述版权声明和本许可声明必须包含在本软件的所有副本或主要部分中。
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+本软件按"原样"提供，不提供任何形式的明示或暗示的保证，包括但不限于适销性、特定用途的适用性
+和非侵权性的保证。在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是
+在合同诉讼、侵权行为或其他方面，由软件或软件的使用或其他交易引起、产生或与之相关。
+
+本项目完全免费，可以用于任何商业用途。使用者可以自由地将本项目用于商业项目，无需支付任何费用
+或获得额外授权。但我们建议在使用本项目时，保留对原作者的署名和感谢。

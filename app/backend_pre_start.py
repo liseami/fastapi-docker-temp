@@ -1,12 +1,11 @@
+"""数据库预启动检查模块
 
-
-# 每次启动时连接数据库并且自动重试
-
+在应用启动前验证数据库连接,实现自动重试机制。
+"""
 
 from sqlalchemy import Engine
 from sqlmodel import Session, select
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
-# from app.third_part.logsnag import LogSNAG
 from app.core.db import engine
 from app.core.config import settings
 import logging
@@ -14,7 +13,8 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-max_tries = 60 * 5  # 5 minutes
+# 重试配置
+max_tries = 60 * 5  # 5分钟,每秒一次
 wait_seconds = 1
 
 
@@ -25,9 +25,16 @@ wait_seconds = 1
     after=after_log(logger, logging.WARN),
 )
 def init(db_engine: Engine) -> None:
+    """验证数据库连接
+
+    Args:
+        db_engine: SQLAlchemy数据库引擎
+
+    Raises:
+        Exception: 数据库连接失败
+    """
     try:
         with Session(db_engine) as session:
-            # Try to create session to check if DB is awake
             session.exec(select(1))
             logger.info("✅——————数据库连接正常")
     except Exception as e:
@@ -38,10 +45,10 @@ def init(db_engine: Engine) -> None:
 
 
 def main() -> None:
+    """执行数据库连接初始化"""
     logger.info("🔗——————开始数据库连接")
     init(engine)
     logger.info("✅——————完成数据库连接")
-    # LogSNAG.get_instance().service_init_success()
 
 
 if __name__ == "__main__":

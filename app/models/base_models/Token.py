@@ -1,11 +1,11 @@
 
 # 包含访问令牌的 JSON 负载
 
-
+from .Base import TableBase
 from sqlmodel import SQLModel
 
 
-class Token(SQLModel):
+class Token(TableBase):
     access_token: str
     token_type: str = "bearer"
 

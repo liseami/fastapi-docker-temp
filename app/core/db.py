@@ -1,73 +1,81 @@
 import multiprocessing
+import logging
 from sqlmodel import Session, create_engine, select
 from app.core.config import settings
-from app.core.security import get_password_hash
-from app.models.BaseModels.User import UserCreate
 from app.models.table import User
-# from app import crud
-# from app.core.config import settings
-# from app.models.User import UserCreate
-# from app.models.table import User
+from app.crud.UserCRUD import UserCRUD
 
 
-cpu_count = multiprocessing.cpu_count() * 2
-workers = cpu_count
-max_db_conn = 500
+def create_database_engine():
+    """创建数据库引擎实例
 
-pool_size = max_db_conn // (workers * 2)
-max_overflow = pool_size
+    计算最佳连接池配置并创建SQLAlchemy引擎。
 
-engine = create_engine(
-    str(settings.SQLALCHEMY_DATABASE_URI),
-    pool_size=pool_size,
-    max_overflow=max_overflow,
-    pool_timeout=30,
-    # 如果需要 SSL 连接，取消下面的注释并提供正确的参数
-    # connect_args={
-    #     "sslmode": "verify-full",
-    #     "sslcert": "/path/to/client-cert.pem",
-    #     "sslkey": "/path/to/client-key.pem",
-    #     "sslrootcert": "/path/to/server-ca.pem",
-    # }
-)
+    说明:
+    1. CPU核心数计算:
+       - 获取CPU核心数并乘以2,这样可以充分利用CPU超线程
+       - workers数等于CPU核心数,确保每个worker都有对应的CPU资源
+
+    2. 连接池配置:
+       - 设置最大数据库连接数为500,这是PostgreSQL的推荐值
+       - pool_size = 最大连接数 ÷ (workers × 2)
+         原因:每个worker都需要连接池,除以2是为了预留buffer
+       - max_overflow设为pool_size,在需要时可以翻倍扩容
+
+    3. 超时设置:
+       - pool_timeout=30秒,防止连接长时间占用
+
+    Returns:
+        SQLAlchemy engine实例
+    """
+    # 1. 计算CPU和workers
+    cpu_count = multiprocessing.cpu_count() * 2
+    workers = cpu_count
+    max_db_conn = 500  # PostgreSQL推荐的最大连接数
+
+    # 2. 计算连接池参数
+    pool_size = max_db_conn // (workers * 2)  # 每个worker预留足够连接
+    max_overflow = pool_size  # 允许连接池翻倍扩容
+
+    # 3. 创建引擎
+    engine = create_engine(
+        str(settings.SQLALCHEMY_DATABASE_URI),
+        pool_size=pool_size,
+        max_overflow=max_overflow,
+        pool_timeout=30
+    )
+
+    return engine
 
 
-# 标记
-# 确保在初始化数据库之前导入了所有 SQLModel 模型 (app.models)
-# 否则, SQLModel 可能无法正确初始化关系
-# 更多详细信息: https://github.com/tiangolo/full-stack-fastapi-template/issues/28
+# 创建全局引擎实例
+engine = create_database_engine()
 
 
 def init_db(session: Session) -> None:
-    #
-    print("✅初始化数据库，尝试检查或添加超级用户")
-    # # 创建超级用户
-    # # 查找第一个超级用户
+    """初始化数据库并创建超级用户。
+
+    Args:
+        session: 数据库会话实例
+    """
+    logger = logging.getLogger(__name__)
+    logger.info("初始化数据库")
+
     user = session.exec(
         select(User)
         .where(User.phone_number == settings.FIRST_SUPERUSER_PHONE_NUMBER)
     ).first()
 
-    # 如果找不到超级用户, 则创建一个新的超级用户
-    if not user:
-        user = UserCreate(username=settings.FIRST_SUPERUSER,
-                          phone_number=settings.FIRST_SUPERUSER_PHONE_NUMBER,
-                          password=settings.FIRST_SUPERUSER_PASSWORD)
-
-
-def create_user(*, session: Session, user_create: UserCreate) -> User:
-    """
-    创建新用户并设置其邀请码。
-    """
-    # 验证数据并哈希密码
-    new_user = User.model_validate(
-        user_create,
-        update={"hashed_password": get_password_hash(user_create.password)}
-    )
-
-    # 将验证后的用户对象添加到数据库会话中
-    session.add(new_user)
-    session.commit()
-    session.refresh(new_user)
-
-    return new_user
+    if not user and settings.FIRST_SUPERUSER:
+        logger.info(f"创建超级用户: {settings.FIRST_SUPERUSER}")
+        try:
+            super_user = UserCRUD(session).create_super_user(
+                settings.FIRST_SUPERUSER_PHONE_NUMBER,
+                settings.FIRST_SUPERUSER,
+                settings.FIRST_SUPERUSER_PASSWORD
+            )
+            logger.info(f"超级用户创建成功: {super_user.username}")
+        except Exception as e:
+            logger.error(f"创建超级用户失败: {str(e)}")
+    if user:
+        logger.info(f"超级用户已存在: {user.username}")

@@ -1,10 +1,10 @@
-
 import os
+import logging
 from app.models.table import SQLModel
 from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
-import sqlalchemy
+
 
 # 导入必要的模块
 
@@ -15,6 +15,8 @@ config = context.config
 # 这行设置了日志记录器。
 fileConfig(config.config_file_name)
 
+# 获取logger实例
+logger = logging.getLogger("alembic")
 
 target_metadata = SQLModel.metadata
 
@@ -24,17 +26,36 @@ target_metadata = SQLModel.metadata
 # ... 等等。
 
 
+# docker中运行，应当连接的是host.docker.internal
+# IDE中，执行迁移，应当使用localhost
+# 根据运行环境选择不同的服务器地址
+def is_running_in_docker() -> bool:
+    return os.getenv("RUNINDOCKER", "False").lower() == "true"
+
+
 def get_url():
-    # 获取数据库连接 URL
-    user = os.getenv("POSTGRES_USER", "liseami")
+    # 获取数据库连接 URL，在开发中或者在docker中进行迁移工作
+    user = os.getenv("POSTGRES_USER", "")
     password = os.getenv("POSTGRES_PASSWORD", "")
-    server = os.getenv("POSTGRES_SERVER", "db")
+
+    # 根据运行环境选择不同的服务器地址
+    if is_running_in_docker():
+        server = os.getenv("POSTGRES_SERVER", "")
+        # docker环境使用的本地连接地址 host.docker.internal
+    else:
+        server = "localhost"
+        # 本地开发环境使用 localhost
+
     port = os.getenv("POSTGRES_PORT", "5432")
-    db = os.getenv("POSTGRES_DB", "app")
+    db = os.getenv("POSTGRES_DB", "")
     return f"postgresql+psycopg://{user}:{password}@{server}:{port}/{db}"
 
 
 def run_migrations_offline():
+    logger.info("数据库迁移: 以'离线'模式运行迁移。")
+    logger.info(f"数据库迁移: RUNINDOCKER环境变量值为: {os.getenv('RUNINDOCKER', '')}")
+    logger.info(f"数据库迁移: 是否在Docker中运行: {is_running_in_docker()}")
+    logger.info(f"数据库迁移: 数据库连接URL为: {get_url()}")
     """以'离线'模式运行迁移。
 
     这将配置上下文仅包含 URL
@@ -57,6 +78,10 @@ def run_migrations_offline():
 
 
 def run_migrations_online():
+    logger.info("数据库迁移: 以'在线'模式运行迁移。")
+    logger.info(f"数据库迁移: RUNINDOCKER环境变量值为: {os.getenv('RUNINDOCKER', '')}")
+    logger.info(f"数据库迁移: 是否在Docker中运行: {is_running_in_docker()}")
+    logger.info(f"数据库迁移: 数据库连接URL为: {get_url()}")
     """以'在线'模式运行迁移。
 
     在这种情况下，我们需要创建一个 Engine
@@ -78,7 +103,6 @@ def run_migrations_online():
         context.configure(
             connection=connection, target_metadata=target_metadata, compare_type=True
         )
-
         with context.begin_transaction():
             # 执行迁移
             context.run_migrations()
