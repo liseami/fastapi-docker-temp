@@ -22,7 +22,7 @@ def create_access_token(subject: str | Any, expires_delta: timedelta) -> str:
     Returns:
         生成的JWT令牌字符串
     """
-    expire = datetime.now(datetime.UTC) + expires_delta
+    expire = datetime.now() + expires_delta
     to_encode = {"exp": expire, "sub": str(subject)}
     encoded_jwt = jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)

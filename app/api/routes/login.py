@@ -19,8 +19,7 @@ router = APIRouter()
 @router.post("/request_sms_code", summary="发送登录验证码", response_model=RespMod)
 async def request_sms_code(
     session: SessionDep,
-    phone_number: str = Body(embed=True),
-    client_ip: str = Depends(get_client_ip)
+    phone_number: str = Body(embed=True)
 ):
     """发送短信验证码给指定手机号.
 
@@ -57,7 +56,10 @@ async def send_sms_code_to_phone_number(*, session=SessionDep, phone_number: str
 
 
 @router.post("/signup_and_login_with_mobile_phone_and_sms_code", summary="验证码注册&自动登录用户", response_model=RespMod)
-def phone_login(request: Request, session: SessionDep, phone_number: str = Body(), sms_code: int = Body()):
+def phone_login(request: Request,
+                session: SessionDep,
+                phone_number: str = Body(),
+                sms_code: int = Body()):
     """使用短信验证码进行用户注册和登录.
 
     Args:
