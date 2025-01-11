@@ -13,7 +13,7 @@ def get_all_todo(session: SessionDep):
 
 @router.post("/add", summary="添加todo")
 def add_todo(session: SessionDep, text: str = Body(embed=True)):
-    TodoCRUD(session).create_todo(text)
+    TodoCRUD(session).create_todo(text, user_id="")
     return ""
 
 

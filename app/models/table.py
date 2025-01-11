@@ -8,7 +8,7 @@ from app.models.base_models.UserBase import UserBase
 
 # 用户表
 class User(UserBase, table=True):
-    pass
+    todos: list["Todo"] = Relationship(back_populates="user")
 
 
 # 短信发送记录
@@ -18,4 +18,5 @@ class SMSCodeRecord(SMSCodeRecordBase, table=True):
 
 # Todo表
 class Todo(TodoBase, table=True):
-    pass
+    user_id: UUID = Field(foreign_key="user.id")
+    user: User = Relationship(back_populates="todos")
