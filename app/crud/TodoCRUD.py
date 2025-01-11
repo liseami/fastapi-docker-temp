@@ -24,9 +24,9 @@ class TodoCRUD:
                                   False, Todo.is_deleted == False)
         return self.session.exec(stmt).all()
 
-    def create_todo(self, text: str) -> Todo:
+    def create_todo(self, text: str, userid: str) -> Todo:
         """创建新的todo"""
-        new_todo = Todo(text=text)
+        new_todo = Todo(text=text, userid=userid)
         self.session.add(new_todo)
         self.session.commit()
         self.session.refresh(new_todo)

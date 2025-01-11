@@ -20,6 +20,7 @@ class UserBase(TableBase):
     - 软删除支持
     - 描述字段
     """
+
     username: str | None = Field(
         unique=True,
         index=True,
