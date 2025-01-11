@@ -18,5 +18,5 @@ class SMSCodeRecord(SMSCodeRecordBase, table=True):
 
 # Todo表
 class Todo(TodoBase, table=True):
-    user_id: UUID = Field(foreign_key="user.id", description="所属用户ID")
-    user: User = Relationship(back_populates="todos")
+    user_id: UUID = Field(foreign_key="user.id")
+    user: User | None = Relationship(back_populates="todos")
