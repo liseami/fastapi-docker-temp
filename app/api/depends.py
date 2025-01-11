@@ -89,7 +89,8 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
         token_data = TokenPayload(**payload)
-    except (JWTError, ValidationError, ValueError):
+    except (JWTError, ValidationError, ValueError) as e:
+        print(f"Token验证失败: {str(e)}")
         raise HTTPException(
             status_code=400, detail="请重新登录。")
     # 从会话中获取用户

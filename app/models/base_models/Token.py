@@ -13,4 +13,4 @@ class Token(TableBase):
 
 
 class TokenPayload(SQLModel):
-    sub: int | None = None
+    sub: str | None = None
