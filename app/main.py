@@ -88,8 +88,8 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     # 生产环境禁用文档
-    docs_url=None if settings.ENVIRONMENT == "production" else "/docs",
-    redoc_url=None,
+    # docs_url=None if settings.ENVIRONMENT == "production" else "/docs",
+    # redoc_url=None,
     lifespan=lifespan,
 )
 
