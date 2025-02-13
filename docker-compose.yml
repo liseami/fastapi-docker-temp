@@ -36,7 +36,7 @@ services:
       
     # 加载生产环境变量
     env_file:
-      - .env.staging
+      - .env
 
     # 启动生产服务
     command: /WORKDIR/start.sh
