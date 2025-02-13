@@ -34,18 +34,10 @@ def is_running_in_docker() -> bool:
 
 
 def get_url():
-    # 获取数据库连接 URL，在开发中或者在docker中进行迁移工作
+    # 获取数据库连接 URL
     user = os.getenv("POSTGRES_USER", "")
     password = os.getenv("POSTGRES_PASSWORD", "")
-
-    # 根据运行环境选择不同的服务器地址
-    if is_running_in_docker():
-        server = os.getenv("POSTGRES_SERVER", "")
-        # docker环境使用的本地连接地址 host.docker.internal
-    else:
-        server = "localhost"
-        # 本地开发环境使用 localhost
-
+    server = os.getenv("POSTGRES_SERVER", "")  # 直接使用环境变量中的服务器地址
     port = os.getenv("POSTGRES_PORT", "5432")
     db = os.getenv("POSTGRES_DB", "")
     return f"postgresql+psycopg://{user}:{password}@{server}:{port}/{db}"
