@@ -19,7 +19,7 @@ set -e
 # # 启动应用
  if [ "$ENVIRONMENT" = "production" ] || [ "$ENVIRONMENT" = "staging" ]; then
      python /WORKDIR/app/log_info.py "在生产或暂存环境中启动应用，使用 $WORKERS 个workers"
-     exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers $WORKERS
+     exec uvicorn app.main:app --host 0.0.0.0 --port 8888 --workers $WORKERS
  else
  # 本地开发模式
      python /WORKDIR/app/log_info.py "在开发环境中启动应用，启用热重载模式"
