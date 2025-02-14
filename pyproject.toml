@@ -18,6 +18,7 @@ psycopg = {version = "^3.2.1", extras = ["binary", "pool"]}
 passlib = "^1.7.4"
 python-jose = "^3.3.0"
 psycopg2 = "^2.9.9"
+openai = "^1.63.0"
 
 
 [build-system]
