@@ -82,22 +82,37 @@ class UserCRUD:
         user_id: UUID,
         update_data: dict
     ) -> Optional[User]:
-        """更新用户信息"""
+        """更新用户信息
+
+        Args:
+            user_id (UUID): 需要更新的用户ID
+            update_data (dict): 包含要更新的字段和值的字典
+                例如: {"username": "新用户名"}
+
+        Returns:
+            Optional[User]: 更新成功返回更新后的用户对象,用户不存在或已删除返回None
+
+        说明:
+            - 只允许更新username字段
+            - 其他字段的更新请求将被忽略
+        """
+        # 获取用户并检查是否存在或已删除
         user = self.get_user(user_id)
         if not user or user.is_deleted:
             return None
 
-        # 如果更新数据中包含密码，需要先哈希处理
-        if "password" in update_data:
-            update_data["hashed_password"] = get_password_hash(
-                update_data.pop("password"))
+        # 将update_data中字段为空的值剔除
+        update_data = {k: v for k, v in update_data.items() if v is not None}
 
-        for key, value in update_data.items():
-            setattr(user, key, value)
+        # 只更新username字段
+        if "username" in update_data:
+            user.username = update_data["username"]
 
+        # 保存更新到数据库
         self.session.add(user)
         self.session.commit()
         self.session.refresh(user)
+
         return user
 
     def delete_user(self, user_id: UUID) -> bool:

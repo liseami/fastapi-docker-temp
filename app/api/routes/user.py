@@ -4,6 +4,7 @@ from app.models.public_models.Out import ErrorMod
 from app.api.depends import CurrentUser, SessionDep
 from app.models.public_models.Out import RespMod
 from app.crud.UserCRUD import UserCRUD
+from app.models.base_models.UserBase import UserUpdate
 
 router = APIRouter()
 
@@ -34,3 +35,20 @@ def get_user_profile(user: CurrentUser, session: SessionDep):
         return RespMod(data=user.model_dump())
     else:
         raise ErrorMod(message="用户不存在")
+
+
+@router.post("/update", summary="更新用户信息",
+             description="更新当前登录用户的用户名")
+def update_user_profile(
+    user: CurrentUser,
+    session: SessionDep,
+    update_data: UserUpdate
+):
+    update_data = update_data.model_dump(exclude_unset=True)
+    print(update_data)
+    user = UserCRUD(session=session).update_user(
+        user.id, update_data)
+    if user:
+        return RespMod(data=user.model_dump())
+    else:
+        raise ErrorMod(message="更新失败")

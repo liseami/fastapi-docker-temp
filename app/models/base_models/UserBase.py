@@ -1,7 +1,6 @@
-
-
 from sqlmodel import Field, SQLModel
 from .Base import TableBase
+from pydantic import BaseModel
 
 
 class UserBase(TableBase):
@@ -60,3 +59,7 @@ class UserCreate(UserBase):
     - 创建完成后密码会被转换为hashed_password存储
     """
     password: str
+
+
+class UserUpdate(BaseModel):
+    username: str | None = Field(None, description="用户名")

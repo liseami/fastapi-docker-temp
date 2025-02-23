@@ -1,8 +1,11 @@
 from openai import OpenAI
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 import json
+
+from app.api.depends import CurrentUser, SessionDep
+from app.crud.DivinationRecordCRUD import DivinationRecordCRUD
 
 
 router = APIRouter()
@@ -96,7 +99,18 @@ def chat_stream(userinput: str = Body(embed=True)):
 
 
 @router.post("/divination", summary="起卦接口")
-def chat_stream(request: DivinationRequest = Body()):
+def chat_stream(user: CurrentUser, session: SessionDep, request: DivinationRequest = Body()):
+    userid = user.id
+    new_record = DivinationRecordCRUD(session=session).create_record(
+        title="默认标题（有待AI生成）",
+        question=request.q,
+        current_gua=request.current,
+        change_gua=request.future,
+        user_id=userid,
+        ai_answer=""
+    )
+    newid = new_record.id
+
     client = OpenAI(api_key="7inuAV7zPEAP5PsAmxcVZYv33G5dv1vcvNtOJqkt8yZvGwB8jNgv6FCs5tgpSHigI",
                     base_url="https://api.stepfun.com/v1")
 
@@ -114,8 +128,9 @@ def chat_stream(request: DivinationRequest = Body()):
         1. 析本卦({request.current})之象,阐释当下之境遇与困厄
         2. 论变卦({request.future})之意,推演未来之趋向与变化
         3. 综两卦之玄机,授具体之策略,助问者趋吉避凶
-        
+
         注意:
+
         - 行文须典雅庄重,多引《易经》、《周易》经典语句
         - 但一定要使用普通用户也能听得懂的语言进行输出
         - 结论需明确可行,助人化解疑虑
@@ -134,11 +149,20 @@ def chat_stream(request: DivinationRequest = Body()):
                 },
             ],
             temperature=0.7,
-            stream=True  # 启用流式传输
+            stream=True,  # 启用流式传输
         )
 
         for chunk in response:
             print("收到的chunk:", chunk)  # 打印每个chunk
+            if chunk.choices[0].finish_reason == "stop":
+                print("AI回答结束")
+                print(collected_content)
+                update = DivinationRecordCRUD(session=session).update_record(
+                    record_id=newid,
+                    ai_answer=collected_content,
+                    user_id=userid
+                )
+                print(update)
             if chunk.choices[0].delta.content is not None:
                 collected_content += chunk.choices[0].delta.content  # 累加新的内容
                 yield f"data: {json.dumps({'content': collected_content}, ensure_ascii=False)}\n\n"

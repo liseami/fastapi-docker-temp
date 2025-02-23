@@ -10,7 +10,7 @@
 #
 # 完全重建生产环境:
 # docker compose down
-# docker compose build --no-cache
+# docker compose build --no-cachej
 #
 # 版本说明:
 # version '3.8' 支持 Docker 19.03.0+ 版本
@@ -30,7 +30,7 @@ services:
     restart: always  # 生产容器崩溃时自动重启
     
     # 端口映射配置
-    # 将生产容器的 8000 端口映射到主机的 8000 端口
+    # 将生产容器的 8888 端口映射到主机的 8888 端口
     ports:
       - "8888:8888"
       
